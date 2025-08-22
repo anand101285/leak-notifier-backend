@@ -1,0 +1,88 @@
+trigger:
+- main
+- dev
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: ManualApproval
+    jobs:
+      - job: ManualApprovalJob
+        pool: server
+        timeoutInMinutes: 10
+        steps:
+          # - script: echo Manual approval is required before proceeding...
+          #   displayName: 'Manual Approval Required'
+          #   condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+
+          # ------------ Validation For push in MAIN or PROD Branch.   -----------------------------------------------
+          - task: ManualValidation@0
+            timeoutInMinutes: 10
+            inputs:
+              notifyUsers: 'qammar@cytomate.net'
+              instructions: 'Please Approve code is pushed in main Branch'
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+          
+  - stage: Build
+    displayName: 'Build Stage'
+    jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        # - task: NodeTool@0
+        #   inputs:
+        #     versionSpec: '20.5.1'  # Ensure to use a compatible Node.js version
+        #   displayName: 'Install Node.js'
+        #   condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '20.11.0'  # Ensure to use a compatible Node.js version
+          displayName: 'Install Node.js'
+          
+        - script: |
+            npm install express --save
+            npm install 
+            npm run build
+          displayName: 'Install npm dependencies'
+          condition: eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+
+        # - script: |
+        #     npm run lint
+        #   displayName: 'Run linter to check for syntax errors'
+
+        # - script: |
+        #     npm run build
+        #   displayName: 'Build the React app'
+
+        - script: |
+            ls -la $(Build.SourcesDirectory)
+          displayName: 'List directory contents'
+
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: '$(Build.SourcesDirectory)'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+            replaceExistingArchive: true
+          displayName: 'Archive build files'
+
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
+          displayName: 'Publish Artifact'
+
+
+
+
+        - task: DeleteFiles@1
+          inputs:
+            SourceFolder: '$(Build.SourcesDirectory)'
+          displayName: 'Clean up workspace'
+
+
