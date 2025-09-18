@@ -1,0 +1,160 @@
+name: Productions-backend-applycyber
+
+on:
+    push:
+        branches: [main]
+
+    workflow_dispatch:
+
+jobs:
+    # malaysia-deploy:
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - name: Checkout code
+    #           uses: actions/checkout@v2
+
+    #         - name: Set up Node.js
+    #           uses: actions/setup-node@v2
+    #           with:
+    #               node-version: '20.11.0'
+
+    #         - name: Copying development files
+    #           run: cp .env.malaysia .env.production
+
+    #         - name: Install dependencies
+    #           run: npm install
+
+    #         - name: 🛠 Build
+    #           run: npm run build-prod
+
+    #         - name: transfer file rsync
+    #           uses: burnett01/rsync-deployments@5.1
+    #           with:
+    #               switches: -avzr --delete --include=".env.production" --exclude="node_modules/*"
+    #               path: .
+    #               remote_path: /home/ideploy/deployment/
+    #               remote_host: '${{ secrets.HOST_MALAYSIA_URL }}'
+    #               remote_user: ideploy
+    #               remote_key: '${{ secrets.SSH_MALAYSIA_KEY }}'
+
+    #         - name: executing remote ssh commands using ssh key
+    #           uses: appleboy/ssh-action@master
+    #           with:
+    #               host: '${{ secrets.HOST_MALAYSIA_URL }}'
+    #               username: ideploy
+    #               key: ${{ secrets.SSH_MALAYSIA_KEY }}
+    #               script: sh /home/ideploy/deploy.sh
+
+    # singapore-deploy:
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - name: Checkout code
+    #           uses: actions/checkout@v2
+
+    #         - name: Set up Node.js
+    #           uses: actions/setup-node@v2
+    #           with:
+    #               node-version: '20.11.0'
+
+    #         - name: Copying development files
+    #           run: cp .env.singapore .env.production
+
+    #         - name: Install dependencies
+    #           run: npm install
+
+    #         - name: 🛠 Build
+    #           run: npm run build-prod
+
+    #         - name: transfer file rsync
+    #           uses: burnett01/rsync-deployments@5.1
+    #           with:
+    #               switches: -avzr --delete --include=".env.production" --exclude="node_modules/*"
+    #               path: .
+    #               remote_path: /home/ideploy/deployment/
+    #               remote_host: '${{ secrets.HOST_SINGAPORE_URL }}'
+    #               remote_user: ideploy
+    #               remote_key: '${{ secrets.SSH_SINGAPORE_KEY }}'
+
+    #         - name: executing remote ssh commands using ssh key
+    #           uses: appleboy/ssh-action@master
+    #           with:
+    #               host: '${{ secrets.HOST_SINGAPORE_URL }}'
+    #               username: ideploy
+    #               key: ${{ secrets.SSH_SINGAPORE_KEY }}
+    #               script: sh /home/ideploy/deploy.sh
+
+    # indonesia-deploy:
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - name: Checkout code
+    #           uses: actions/checkout@v2
+
+    #         - name: Set up Node.js
+    #           uses: actions/setup-node@v2
+    #           with:
+    #               node-version: '20.11.0'
+
+    #         - name: Copying development files
+    #           run: cp .env.indonesia .env.production
+
+    #         - name: Install dependencies
+    #           run: npm install
+
+    #         - name: 🛠 Build
+    #           run: npm run build-prod
+
+    #         - name: transfer file rsync
+    #           uses: burnett01/rsync-deployments@5.1
+    #           with:
+    #               switches: -avzr --delete --include=".env.production" --exclude="node_modules/*"
+    #               path: .
+    #               remote_path: /home/ideploy/deployment/
+    #               remote_host: '${{ secrets.HOST_INDONESIA_URL }}'
+    #               remote_user: ideploy
+    #               remote_key: '${{ secrets.SSH_INDONESIA_KEY }}'
+
+    #         - name: executing remote ssh commands using ssh key
+    #           uses: appleboy/ssh-action@master
+    #           with:
+    #               host: '${{ secrets.HOST_INDONESIA_URL }}'
+    #               username: ideploy
+    #               key: ${{ secrets.SSH_INDONESIA_KEY }}
+    #               script: sh /home/ideploy/deploy.sh
+
+    main-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '20.11.0'
+
+            # - name: Copying development files
+            #   run: cp .env.main .env.production
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: 🛠 Build
+              run: npm run build
+
+            - name: transfer file rsync
+              uses: burnett01/rsync-deployments@5.1
+              with:
+                  switches: -avzr --delete --include=".env.production" --exclude="node_modules/*"
+                  path: .
+                  remote_path: /home/ideploy/deployment/
+                  remote_host: '${{ secrets.HOST_MAINSERVER_URL }}'
+                  remote_user: ideploy
+                  remote_key: '${{ secrets.SSH_MAINSERVER_KEY }}'
+
+            - name: executing remote ssh commands using ssh key
+              uses: appleboy/ssh-action@master
+              with:
+                  host: '${{ secrets.HOST_MAINSERVER_URL }}'
+                  username: ideploy
+                  key: ${{ secrets.SSH_MAINSERVER_KEY }}
+                  script: sh /home/ideploy/deploy.sh
