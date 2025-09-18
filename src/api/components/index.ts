@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Router } from 'express';
+import { registerTestRoutes } from './test/routes';
 
 /**
  * Init Express api routes
@@ -8,4 +9,6 @@ import { Router } from 'express';
  * @param {string} prefix Prefix for attached routes
  * @returns {void}
  */
-export function registerApiRoutes(router: Router, prefix = ''): void {}
+export function registerApiRoutes(router: Router, prefix = 'api'): void {
+    registerTestRoutes(router, prefix);
+}

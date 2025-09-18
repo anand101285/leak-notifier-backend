@@ -4,7 +4,7 @@ import EnvVar from 'dotenv';
 // import { LogLevel } from '@azure/msal-node';
 import fs from 'fs';
 import path from 'path';
-const rootPath = path.resolve(__dirname);
+export const rootPath = path.join(path.resolve(__dirname), '/../', '../');
 EnvVar.config({ path: `.env.${process.env.NODE_ENV}` });
 
 /**
@@ -13,6 +13,13 @@ EnvVar.config({ path: `.env.${process.env.NODE_ENV}` });
 if (!fs.existsSync(path.join(rootPath, process.env.UPLOAD_FOLDER as string))) {
     fs.mkdirSync(path.join(rootPath, process.env.UPLOAD_FOLDER as string));
 }
+
+let mailConfig: {
+    SES_ACCESS_KEY_ID: string;
+    SES_SECRET_ACCESS_KEY: string;
+    SES_REGION: string;
+    SES_FROM_EMAIL: string;
+};
 
 let globals: {
     /**
@@ -126,6 +133,16 @@ let statusCodes: {
     UNPROCESSABLE_ENTITY: number;
 };
 
+let branding: {
+    BRAND_NAME: string;
+};
+
+mailConfig = {
+    SES_ACCESS_KEY_ID: process.env.SES_ACCESS_KEY_ID as string,
+    SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY as string,
+    SES_REGION: process.env.SES_REGION as string,
+    SES_FROM_EMAIL: process.env.SES_FROM_EMAIL as string
+};
 globals = {
     /**
      * Server configurations
@@ -226,6 +243,9 @@ serverUrls = {
     AGENT_URL: process.env.AGENT_URL as string
 };
 
+branding = {
+    BRAND_NAME: process.env.BRAND_NAME as string
+};
 statusCodes = {
     OK: 200,
     BAD_REQUEST: 400,
@@ -237,4 +257,4 @@ statusCodes = {
     UNPROCESSABLE_ENTITY: 422
 };
 
-export { globals, serverUrls, statusCodes };
+export { globals, serverUrls, statusCodes, branding, mailConfig };
