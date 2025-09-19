@@ -1,61 +1,28 @@
 import { branding } from '@config/globals';
 
 // eslint-disable-next-line max-len
-export const header = `<!DOCTYPE html>
-<html lang="en">
+export const header = `<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Confirmation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .email-container {
-            background-color: #ffffff;
-            padding: 20px;
-            margin: 0 auto;
-            max-width: 600px;
-            border: 1px solid #dddddd;
-        }
-        h2 {
-            color: #333333;
-        }
-        p {
-            font-size: 16px;
-            color: #555555;
-        }
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #333333;
-            color: #ffffff;
-            text-align: left;
-            border-top: 4px solid #ffd15c;
-        }
-        .footer p {
-            margin: 5px 0;
-        }
-        .footer .company-name {
-            font-size: 18px;
-            color: #ffd15c;
-            font-weight: bold;
-        }
-        .footer .copyright {
-            font-size: 14px;
-            color: #cccccc;
-        }
-        .logo {
-            height: 40px;
-            width: 40px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>You're on the waitlist — Thanks!</title>
+  <style>
+    /* Basic resets for better cross-client rendering */
+    body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table { border-spacing: 0; }
+    img { border: 0; display: block; }
+    a { color: inherit; text-decoration: none; }
+    /* Responsive */
+    @media only screen and (max-width:480px) {
+      .container { width: 100% !important; padding: 20px !important; }
+      .stack { display:block !important; width:100% !important; }
+      .hero-title { font-size: 22px !important; line-height: 28px !important; }
+      .btn { width: 100% !important; }
+    }
+  </style>
 </head>
-<body>
-<div class="email-container">
+<body style="background-color: #F5F4FF; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #111;">
     
     `;
 

@@ -1,6 +1,5 @@
 import { prepareSuccessResponse } from '@api/baseController';
 import { MailService } from '@services/mail/mail';
-import { MailTemplates } from '@services/mail/templates';
 import { bind } from 'decko';
 import { NextFunction, Request, Response } from 'express';
 
@@ -22,13 +21,13 @@ export default class TestController {
         next: NextFunction
     ): Promise<Response | void> {
         try {
-            const regTemplate = MailTemplates.getRegistration('test asda');
+            // const regTemplate = MailTemplates.getRegistration('test asda');
 
-            this.mailService.setMailOptions(
-                'anand.talreja0@gmail.com',
-                regTemplate.subject,
-                regTemplate.html
-            );
+            // this.mailService.setMailOptions(
+            //     'anand.talreja0@gmail.com',
+            //     regTemplate.subject,
+            //     regTemplate.html
+            // );
 
             await this.mailService.sendMail();
 

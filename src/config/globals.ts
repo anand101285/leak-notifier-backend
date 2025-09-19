@@ -15,10 +15,9 @@ if (!fs.existsSync(path.join(rootPath, process.env.UPLOAD_FOLDER as string))) {
 }
 
 let mailConfig: {
-    SES_ACCESS_KEY_ID: string;
-    SES_SECRET_ACCESS_KEY: string;
-    SES_REGION: string;
-    SES_FROM_EMAIL: string;
+    RESEND_DOMAIN: string;
+    RESEND_API_KEY: string;
+    RESEND_FROM_EMAIL: string;
 };
 
 let globals: {
@@ -138,10 +137,9 @@ let branding: {
 };
 
 mailConfig = {
-    SES_ACCESS_KEY_ID: process.env.SES_ACCESS_KEY_ID as string,
-    SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY as string,
-    SES_REGION: process.env.SES_REGION as string,
-    SES_FROM_EMAIL: process.env.SES_FROM_EMAIL as string
+    RESEND_DOMAIN: process.env.RESEND_DOMAIN as string,
+    RESEND_API_KEY: process.env.RESEND_API_KEY as string,
+    RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL as string
 };
 globals = {
     /**

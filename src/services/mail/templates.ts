@@ -1,4 +1,4 @@
-import { getRegistrationTemplate } from './emailBody';
+import { getWaitlistTemplate } from './emailBody';
 
 interface TemplateObjects {
     subject: string;
@@ -14,19 +14,14 @@ interface TemplateObjects {
  */
 export class MailTemplates {
     /**
-     * Get registration template
+     * Get Waitlist template
      *
-     * @param {string} firstName First name
-     * @param {string} emailToken Email verification token
      * @returns {object} subject, html and test
      */
-    public static getRegistration(firstName: string): TemplateObjects {
+    public static getWaitlist(): TemplateObjects {
         return {
-            subject: 'Your account has been created',
-            html: getRegistrationTemplate({
-                firstName: firstName, // prevent injection attacks
-                verificationLink: `url here`
-            }),
+            subject: 'Welcome aboard! Your waitlist spot is saved',
+            html: getWaitlistTemplate(),
             text: undefined
         };
     }

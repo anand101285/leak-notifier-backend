@@ -1,162 +1,10 @@
-// import { globals, rootPath } from '@config/globals';
-// import {
-//     Auth,
-//     ISetMailAttachmentOptions,
-//     NodemailerServiceAuth,
-//     OAuth2Nodemailer
-// } from '@customTypes/mail/index';
-// import { readFileSync } from 'fs';
-// import { google } from 'googleapis';
-// import {
-//     createTransport,
-//     SendMailOptions,
-//     SentMessageInfo,
-//     Transporter,
-//     TransportOptions
-// } from 'nodemailer';
-// import path from 'path';
-// const OAuth2 = google.auth.OAuth2;
+import { mailConfig } from '@config/globals';
+import { ISetMailAttachmentOptions } from '@customTypes/mail';
 
-// /**
-//  * MailService
-//  *
-//  * Service for sending emails
-//  */
-// export class MailService {
-//     private from: string;
-//     private mailOptions: SendMailOptions;
-
-//     // /**
-//     //  * Constructor
-//     //  * @param {NodemailerAuth | NodemailerServiceAuth} authObject nodemailer auth object
-//     //  */
-//     //  constructor(
-//     //     authObject: NodemailerAuth | NodemailerServiceAuth = globals.NODEMAILER_GENERAL_EMAIL
-//     // ) {
-
-//     // }
-
-//     public async createTransport(): Promise<Transporter> {
-//         const authObject: NodemailerServiceAuth = globals.NODEMAILER_GENERAL_EMAIL;
-//         const oauth2Object = authObject.auth as OAuth2Nodemailer;
-//         console.log('here');
-
-//         const oauth2Client = new OAuth2(
-//             oauth2Object.clientId,
-//             oauth2Object.clientSecret,
-//             oauth2Object.redirectUrl
-//         );
-//         oauth2Client.setCredentials({
-//             // eslint-disable-next-line camelcase
-//             refresh_token: oauth2Object.refreshToken
-//         });
-//         const accessToken = await oauth2Client.getAccessToken();
-
-//         const transporter = createTransport({
-//             service: authObject.service,
-//             auth: {
-//                 ...authObject.auth,
-//                 accessToken: accessToken
-//             }
-//         } as TransportOptions);
-
-//         this.from = oauth2Object.user;
-//         return transporter;
-//     }
-
-//     /**
-//      * Type guard for checking oauth2
-//      *
-//      * @param {Auth | OAuth2Nodemailer} auth auth object
-//      * @returns {boolean}
-//      */
-//     private isOauth2(auth: Auth | OAuth2Nodemailer): auth is OAuth2Nodemailer {
-//         return (auth as OAuth2Nodemailer).clientId !== undefined;
-//     }
-
-//     /**
-//      * Set mail options
-//      *
-//      * @param {string | Array<string>} sendTo Emails to be sent
-//      * @param {string} subject Subject of email
-//      * @param {string} html Body of email
-//      * @param {ISetMailAttachmentOptions[] | undefined} attachments attachments to send
-//      */
-//     public setMailOptions(
-//         sendTo: string | Array<string>,
-//         subject: string,
-//         html: string,
-//         attachments?: ISetMailAttachmentOptions[] | undefined
-//     ): void {
-//         const imageAttachment = readFileSync(path.join(rootPath, 'assets', 'logo.png'));
-
-//         const logoAttachment = {
-//             filename: 'logo.png',
-//             content: imageAttachment,
-//             encoding: 'base64',
-//             cid: 'uniqueImageCID'
-//         };
-//         this.mailOptions = {
-//             attachments: attachments ? [logoAttachment, ...attachments] : [logoAttachment],
-//             from: this.from,
-//             subject: subject,
-//             html: html
-//         };
-
-//         this.mailOptions.to = sendTo;
-//     }
-
-//     /**
-//      * Send email
-//      *
-//      * @returns {Promise<SentMessageInfo | unknown>} info of sent mail
-//      */
-//     public async sendMail(): Promise<SentMessageInfo> {
-//         const transporter = await this.createTransport();
-//         return transporter.sendMail(this.mailOptions);
-//     }
-// }
-
-// import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
-import { mailConfig, rootPath } from '@config/globals';
-import { readFileSync } from 'fs';
-import nodemailer, { SendMailOptions, SentMessageInfo, Transporter } from 'nodemailer';
-import path from 'path';
-
+import { CreateEmailOptions, CreateEmailResponse, Resend } from 'resend';
 export class MailService {
     private from: string;
-    private mailOptions: SendMailOptions;
-
-    /**
-     * Creates and returns a nodemailer SES transporter.
-     *
-     * @returns {Transporter} Nodemailer transporter configured for AWS SES
-     */
-    public createTransport(): Transporter {
-        // const sesClient = new SESv2Client({
-        //     region: String(mailConfig.SES_REGION),
-        //     credentials: {
-        //         accessKeyId: String(mailConfig.SES_ACCESS_KEY_ID),
-        //         secretAccessKey: String(mailConfig.SES_SECRET_ACCESS_KEY)
-        //     }
-        // });
-
-        // Use SES transport
-        const transporter = nodemailer.createTransport({
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            // SES: { sesClient: sesClient, SendEmailCommand: SendEmailCommand }
-            host: 'smtp.mailersend.net',
-            port: 587,
-            secure: false,
-            auth: {
-                user: 'MS_nZiJMn@test-r83ql3pkevmgzw1j.mlsender.net',
-                pass: 'mssp.L3GFrF0.jpzkmgqpnj2l059v.R0w6lic'
-            }
-        });
-        this.from = String(mailConfig.SES_FROM_EMAIL);
-        return transporter;
-    }
+    private mailOptions: CreateEmailOptions;
 
     /**
      * Sets the mail options including recipients, subject, HTML body, and attachments.
@@ -169,23 +17,24 @@ export class MailService {
     public setMailOptions(
         sendTo: string | Array<string>,
         subject: string,
-        html: string
-        // attachments?: ISetMailAttachmentOptions[] | undefined
+        html: string,
+        attachments?: ISetMailAttachmentOptions[] | undefined
     ): void {
-        const imageAttachment = readFileSync(path.join(rootPath, 'assets', 'logo.png'));
-        const logoAttachment = {
-            filename: 'logo.png',
-            content: imageAttachment,
-            encoding: 'base64',
-            cid: 'uniqueImageCID'
-        };
+        // const imageAttachment = path.join(rootPath, 'assets', 'logo.png');
+        // const logoAttachment = {
+        //     path: imageAttachment,
+        //     filename: 'logo.png',
+        //     // eslint-disable-next-line camelcase
+        //     content_id: 'uniqueImageCID'
+        // };
 
-        console.log(logoAttachment, html);
+        // console.log(logoAttachment, html);
         this.mailOptions = {
-            // attachments: attachments ? [logoAttachment, ...attachments] : [logoAttachment],
-            from: mailConfig.SES_FROM_EMAIL,
+            attachments: attachments,
+            from: mailConfig.RESEND_FROM_EMAIL,
+            to: sendTo,
             subject: subject,
-            text: 'hello test'
+            html: html
         };
         this.mailOptions.to = sendTo;
     }
@@ -195,9 +44,14 @@ export class MailService {
      *
      * @returns {Promise<SentMessageInfo>} Info about the sent email.
      */
-    public async sendMail(): Promise<SentMessageInfo> {
-        const transporter = this.createTransport();
-        console.log('email optsss', this.mailOptions);
-        return transporter.sendMail(this.mailOptions);
+    public async sendMail(): Promise<CreateEmailResponse> {
+        const resend = new Resend(mailConfig.RESEND_API_KEY);
+        await resend.domains.create({
+            name: mailConfig.RESEND_DOMAIN,
+            customReturnPath: 'outbound'
+        });
+
+        return await resend.emails.send(this.mailOptions);
+        // return transporter.sendMail(this.mailOptions);
     }
 }
