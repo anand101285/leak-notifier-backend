@@ -1,4 +1,4 @@
-import { getWaitlistTemplate } from './emailBody';
+import { getWaitlistTemplate, getOtpTemplate } from './emailBody';
 
 interface TemplateObjects {
     subject: string;
@@ -22,6 +22,20 @@ export class MailTemplates {
         return {
             subject: 'Welcome aboard! Your waitlist spot is saved',
             html: getWaitlistTemplate(),
+            text: undefined
+        };
+    }
+
+    /**
+     * Get register template
+     *
+     * @param {number} otp otp
+     * @returns {object} subject, html and test
+     */
+    public static getRegister(otp: string): TemplateObjects {
+        return {
+            subject: 'Welcome aboard! Thank you for registering',
+            html: getOtpTemplate(otp),
             text: undefined
         };
     }

@@ -28,5 +28,20 @@ export default class UserCoreRoutes {
             validateReqBody(),
             this.controller.joinWaitlist
         );
+
+        this.router.post(
+            '/register',
+            [check('email', 'email is required and should be valid').isEmail()],
+            this.controller.register
+        );
+
+        this.router.post(
+            '/verify-otp',
+            [
+                check('otp', 'otp is required and should be valid').isString(),
+                check('hash', 'hash is required and should be valid').isString()
+            ],
+            this.controller.verifyOTP
+        );
     }
 }

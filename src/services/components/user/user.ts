@@ -1,13 +1,15 @@
-import { IUserModel, IUserDocument } from '@models/index';
-import { AuthService } from '@services/auth';
-import { UtilityService } from '@services/helper/utility';
-import Dao from '@models/dataAccessObject';
-import { globals, statusCodes } from '@config/globals';
+import { statusCodes } from '@config/globals';
 import { ServiceError } from '@customErrors/index';
 import { UserRole } from '@customTypes/index';
+import Dao from '@models/dataAccessObject';
+import { IUserDocument, IUserModel, SubscriptionType } from '@models/index';
+import { AuthService } from '@services/auth';
+import { UtilityService } from '@services/helper/utility';
+import SubscriptionService from '../subscriptions/subscription';
 
 export default class UserService extends Dao<IUserModel> {
     private readonly authService: AuthService = new AuthService('user');
+    private readonly subscriptionService: SubscriptionService = new SubscriptionService();
 
     /**
      * Constructor
@@ -19,7 +21,7 @@ export default class UserService extends Dao<IUserModel> {
     /**
      * Register user
      * @param {string} email email address
-     * @param {string} password user password
+     * @param {SubscriptionType} subscriptionType user password
      * @param {string} firstName user name first
      * @param {string} lastName user name last
      * @param {string} address user address
@@ -28,36 +30,26 @@ export default class UserService extends Dao<IUserModel> {
      */
     public async registerAccount(
         email: string,
-        password: string,
-        firstName: string,
-        lastName: string,
-        address: string,
-        organization: string
+        subscriptionType: SubscriptionType
     ): Promise<IUserDocument | null> {
-        const emailLowerCase = UtilityService.convertToLowercase(email);
-
         try {
+            const emailLowerCase = UtilityService.convertToLowercase(email);
             if (await this.model.findOne({ email: emailLowerCase })) {
                 throw new ServiceError('Email already exists', statusCodes.CONFLICT);
             }
+
+            // create uer model
             // eslint-disable-next-line new-cap
             const user = new this.model({
                 email: emailLowerCase,
-                password: await UtilityService.generatHash(
-                    password,
-                    await UtilityService.generateSalt(globals.SALT_LENGTH)
-                ),
-                role: UserRole.Client,
-                firstName: firstName,
-                lastName: lastName,
-                address: address,
-                organization: organization
+                role: UserRole.Client
             });
 
             await user.save();
 
-            const userDoc = await this.model.findById(user.id).select('-password');
-            return userDoc;
+            await this.subscriptionService.addSubscription(String(user._id), subscriptionType);
+
+            return user;
         } catch (err) {
             throw new ServiceError((err as Error).message, statusCodes.SERVER_ERROR);
         }

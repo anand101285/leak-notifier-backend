@@ -370,4 +370,75 @@ const getContactUsTemplate = ({
          ${footer}`;
 };
 
-export { getContactUsTemplate, getWaitlistTemplate };
+const getOtpTemplate = (otp: string) => {
+    return `<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Leak Notifier OTP</title>
+  <style>
+    body {
+    margin: 0;
+    padding: 0;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background-color: #f5f4ff;
+    color: #111;
+    }
+    .container {
+    max-width: 420px;
+    margin: 32px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(41, 4, 75, 0.08);
+    padding: 32px 24px;
+    }
+    .otp-box {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 8px;
+    background: #f8f7ff;
+    border: 1px solid #e9e4ff;
+    border-radius: 8px;
+    padding: 18px 0;
+    text-align: center;
+    color: #680bbd;
+    margin: 24px 0;
+    }
+    .footer {
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    margin-top: 24px;
+    }
+    @media only screen and (max-width: 480px) {
+    .container {
+      padding: 16px 8px;
+    }
+    .otp-box {
+      font-size: 24px;
+      padding: 12px 0;
+    }
+    }
+  </style>
+  </head>
+  <body>
+  <div class="container">
+    <h2 style="color: #29044b; margin-top: 0;">Your One-Time Password (OTP)</h2>
+    <p style="font-size: 15px; color: #333;">
+    Use the OTP below to verify your email address for Leak Notifier.
+    </p>
+    <div class="otp-box">${otp}</div>
+    <p style="font-size: 14px; color: #444;">
+    This OTP is valid for a limited time. If you did not request this, please ignore this email.
+    </p>
+    <div class="footer">
+    &copy; 2025 Leak Notifier Inc. • All rights reserved.
+    </div>
+  </div>
+  </body>
+</html>
+`;
+};
+
+export { getContactUsTemplate, getWaitlistTemplate, getOtpTemplate };
