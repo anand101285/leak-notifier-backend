@@ -1,9 +1,10 @@
 /* eslint-disable new-cap */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { prepareFailedResponse, prepareSuccessResponse } from '@api/baseController';
-import { statusCodes } from '@config/globals';
+import { globals, statusCodes } from '@config/globals';
 import user from '@models/components/user/user';
-import { SubscriptionType } from '@models/index';
+import { IUserDocument, SubscriptionType } from '@models/index';
+import { AuthService } from '@services/auth';
 import OTPService from '@services/components/otps/otps';
 import UserService from '@services/components/user/user';
 import WaitlistService from '@services/components/waitlist/waitlist';
@@ -16,6 +17,7 @@ export default class TestController {
     private waitlistService: WaitlistService = new WaitlistService();
     private mailService: MailService = new MailService();
     private userService: UserService = new UserService(user);
+    private authService: AuthService = new AuthService('user');
     private otpService: OTPService = new OTPService();
 
     /**
@@ -80,13 +82,19 @@ export default class TestController {
         try {
             const { email }: { email: string } = req.body;
 
-            const newUser = await this.userService.registerAccount(email, SubscriptionType.Free);
+            let userDoc: IUserDocument | null = await this.userService.model.findOne({
+                email: email
+            });
 
-            if (!newUser) {
-                return prepareFailedResponse(res, ['cannot created new user']);
+            // if user doesnot exist reate new one
+            if (!userDoc) {
+                userDoc = await this.userService.registerAccount(email, SubscriptionType.Free);
+                if (!userDoc) {
+                    return prepareFailedResponse(res, ['user could not be registered']);
+                }
             }
 
-            const otpDoc = await this.otpService.createOTP(String(newUser?._id));
+            const otpDoc = await this.otpService.createOTP(String(userDoc?._id));
 
             // configure template
             const regTemplate = MailTemplates.getRegister(otpDoc.otpCode);
@@ -95,7 +103,9 @@ export default class TestController {
 
             await this.mailService.sendMail();
 
-            return prepareSuccessResponse(res, 'User registered successfully');
+            return prepareSuccessResponse(res, 'User registered successfully', {
+                hash: otpDoc.hash
+            });
         } catch (err) {
             return next(err);
         }
@@ -123,6 +133,24 @@ export default class TestController {
             if (!verified) {
                 return prepareFailedResponse(res, ['Cannot verify OTP, try to relogin']);
             }
+
+            const otpDoc = await this.otpService.model.findOneAndDelete({
+                otpCode: otp,
+                hash: hash
+            });
+
+            const userDoc = await this.userService.model.findById(otpDoc?.userId);
+
+            if (!userDoc) {
+                return prepareFailedResponse(res, ['User record could not be found']);
+            }
+
+            const token = this.authService.createToken(this.userService.extractPayload(userDoc));
+
+            const encryptedToken = this.authService.encryptToken(token);
+            res.cookie('token', encryptedToken.encryptedData, {
+                ...globals.cookieOptions
+            });
 
             return prepareSuccessResponse(res, 'User logged in successfully');
         } catch (err) {
