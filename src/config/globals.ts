@@ -104,21 +104,12 @@ let globals: {
      * Host IP range
      */
     HOSTONLY_IP_RANGE: string;
+
+    HIBP_API_KEY: string;
 };
 
 let serverUrls: {
-    PROXMOX_URL: string;
-    NODE_IP: string;
-    ELASTIC_SEARCH_API: string;
-    MINES_API: string;
-    SANDBOX_API: string;
-    MALWARE_API: string;
-    WAZUH_URL: string;
-    WAZUH_ES_URL: string;
-    WAZUH_IP: string;
-    MONITORING_URL: string;
-    AGENT_URL: string;
-    WAZUH_MANAGER_IP: string;
+    HIBP_API: string;
 };
 
 let statusCodes: {
@@ -222,23 +213,12 @@ globals = {
     WAZUH_ES_USERNAME: process.env.WAZUH_ES_USERNAME as string,
     WAZUH_ES_PASSWORD: process.env.WAZUH_ES_PASSWORD as string,
 
-    HOSTONLY_IP_RANGE: process.env.HOSTONLY_IP_RANGE as string
+    HOSTONLY_IP_RANGE: process.env.HOSTONLY_IP_RANGE as string,
+    HIBP_API_KEY: process.env.HIBP_API_KEY as string
 };
 
 serverUrls = {
-    PROXMOX_URL: process.env.PROXMOX_URL as string,
-    NODE_IP: process.env.NODE_IP as string,
-    ELASTIC_SEARCH_API: process.env.ELASTIC_SEARCH_API as string,
-    MINES_API: process.env.MINES_API as string,
-    SANDBOX_API: process.env.SANDBOX_API as string,
-    MALWARE_API: process.env.MALWARE_API as string,
-    WAZUH_URL: process.env.WAZUH_URL as string,
-    WAZUH_ES_URL: process.env.WAZUH_ES_URL as string,
-    WAZUH_IP: process.env.WAZUH_IP as string,
-    WAZUH_MANAGER_IP: process.env.WAZUH_MANAGER_IP as string,
-
-    MONITORING_URL: process.env.MONITORING_URL as string,
-    AGENT_URL: process.env.AGENT_URL as string
+    HIBP_API: process.env.HIBP_API as string
 };
 
 branding = {

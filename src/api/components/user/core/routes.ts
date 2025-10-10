@@ -24,7 +24,7 @@ export default class UserCoreRoutes {
     private initRoutes(): void {
         this.router.post(
             '/waitlist',
-            [check('email', 'email is required and should be valid').isEmail()],
+            [check('email', 'email is required and should be valid').isEmail().notEmpty()],
             validateReqBody(),
             this.controller.joinWaitlist
         );
@@ -32,15 +32,17 @@ export default class UserCoreRoutes {
         this.router.post(
             '/register',
             [check('email', 'email is required and should be valid').isEmail()],
+            validateReqBody(),
             this.controller.register
         );
 
         this.router.post(
             '/verify-otp',
             [
-                check('otp', 'otp is required and should be valid').isString(),
-                check('hash', 'hash is required and should be valid').isString()
+                check('otp', 'otp is required and should be valid').isString().notEmpty(),
+                check('hash', 'hash is required and should be valid').isString().notEmpty()
             ],
+            validateReqBody(),
             this.controller.verifyOTP
         );
     }
