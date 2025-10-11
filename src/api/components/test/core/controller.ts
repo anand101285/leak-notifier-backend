@@ -1,10 +1,12 @@
 import { prepareSuccessResponse } from '@api/baseController';
+import HibpService from '@services/components/hibp/hibp';
 import { MailService } from '@services/mail/mail';
 import { bind } from 'decko';
 import { NextFunction, Request, Response } from 'express';
 
 export default class TestController {
     private mailService: MailService = new MailService();
+    private hibp: HibpService = new HibpService();
 
     /**
      * Get All agents
@@ -29,9 +31,10 @@ export default class TestController {
             //     regTemplate.html
             // );
 
-            await this.mailService.sendMail();
+            const data = await this.hibp.getLeaks('muzammilmian7887@gmail.com');
+            // await this.mailService.sendMail();
 
-            return prepareSuccessResponse(res, 'api working correctly', 'read');
+            return prepareSuccessResponse(res, 'api working correctly', data, 'read');
         } catch (err) {
             console.log('error is ', err);
             return next(err);

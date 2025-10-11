@@ -4,7 +4,8 @@
 import { Router as expressRouter } from 'express';
 import UserController from './controller';
 import { check } from 'express-validator';
-import { validateReqBody } from '@api/middleware/locals';
+import { isAuthenticated, isAuthorized, validateReqBody } from '@api/middleware/locals';
+import { UserRole } from '@customTypes/index';
 
 export default class UserCoreRoutes {
     private readonly controller: UserController = new UserController();
@@ -44,6 +45,13 @@ export default class UserCoreRoutes {
             ],
             validateReqBody(),
             this.controller.verifyOTP
+        );
+
+        this.router.get(
+            '/recent-leak',
+            isAuthenticated(),
+            isAuthorized([UserRole.Client]),
+            this.controller.getRecentScan
         );
     }
 }

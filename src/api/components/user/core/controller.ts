@@ -2,9 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { prepareFailedResponse, prepareSuccessResponse } from '@api/baseController';
 import { globals, statusCodes } from '@config/globals';
+import { logger } from '@config/logger';
 import user from '@models/components/user/user';
 import { IUserDocument, SubscriptionType } from '@models/index';
 import { AuthService } from '@services/auth';
+import HibpService from '@services/components/hibp/hibp';
 import OTPService from '@services/components/otps/otps';
 import UserService from '@services/components/user/user';
 import WaitlistService from '@services/components/waitlist/waitlist';
@@ -19,6 +21,7 @@ export default class TestController {
     private userService: UserService = new UserService(user);
     private authService: AuthService = new AuthService('user');
     private otpService: OTPService = new OTPService();
+    private hibpService: HibpService = new HibpService();
 
     /**
      * Get All agents
@@ -112,7 +115,7 @@ export default class TestController {
     }
 
     /**
-     * Register New User
+     * Verify the otp login of user, and if its new user start the scan
      *
      * @param {Request} req Express request
      * @param {Response} res Express response
@@ -145,6 +148,19 @@ export default class TestController {
                 return prepareFailedResponse(res, ['User record could not be found']);
             }
 
+            // check if there has been any scan before
+            const hibp = await this.hibpService.model.findOne({ userId: userDoc?._id });
+            if (!hibp) {
+                this.hibpService
+                    .runScan(userDoc?.email, String(userDoc?._id))
+                    .then(() => {
+                        logger.info('[+] Scan performed');
+                    })
+                    .catch((err) => {
+                        logger.error(err);
+                    });
+            }
+
             const token = this.authService.createToken(this.userService.extractPayload(userDoc));
 
             const encryptedToken = this.authService.encryptToken(token);
@@ -153,6 +169,30 @@ export default class TestController {
             });
 
             return prepareSuccessResponse(res, 'User logged in successfully');
+        } catch (err) {
+            return next(err);
+        }
+    }
+
+    /**
+     * Verify the otp login of user, and if its new user start the scan
+     *
+     * @param {Request} req Express request
+     * @param {Response} res Express response
+     * @param {NextFunction} next Express next
+     * @returns {Promise<Response | void>} Returns HTTP response
+     */
+    @bind
+    public async getRecentScan(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response | void> {
+        try {
+            // check if there has been any scan before
+            const hibp = await this.hibpService.model.findOne({ userId: req.user.id });
+
+            return prepareSuccessResponse(res, 'Recent leaks fetched', hibp);
         } catch (err) {
             return next(err);
         }
